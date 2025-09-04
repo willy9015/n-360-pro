@@ -1,19 +1,18 @@
 import React, { useEffect } from 'react';
 import { Shield } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import guardian360Logo from '@/assets/guardian360-logo.png';
 
-interface SplashScreenProps {
-  onComplete: () => void;
-}
+const SplashScreen: React.FC = () => {
+  const navigate = useNavigate();
 
-const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      onComplete();
+      navigate('/login');
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [onComplete]);
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary via-primary-light to-primary-glow flex items-center justify-center">

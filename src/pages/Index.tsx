@@ -1,70 +1,66 @@
-import React, { useState } from 'react';
-import SplashScreen from './SplashScreen';
-import Login from './Login';
-import Dashboard from './Dashboard';
-import Profile from './Profile';
-import { BottomNav } from '@/components/navigation/BottomNav';
-
-type AppState = 'splash' | 'login' | 'app';
-type TabState = 'home' | 'safety' | 'analytics' | 'settings' | 'profile';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Shield, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import guardian360Logo from '@/assets/guardian360-logo.png';
 
 const Index = () => {
-  const [currentScreen, setCurrentScreen] = useState<AppState>('splash');
-  const [activeTab, setActiveTab] = useState<TabState>('home');
+  const navigate = useNavigate();
 
-  const handleSplashComplete = () => {
-    setCurrentScreen('login');
-  };
+  useEffect(() => {
+    // Auto-redirect to splash screen after a brief moment
+    const timer = setTimeout(() => {
+      navigate('/splash');
+    }, 2000);
 
-  const handleLoginSuccess = () => {
-    setCurrentScreen('app');
-  };
+    return () => clearTimeout(timer);
+  }, [navigate]);
 
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab as TabState);
-  };
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary via-primary-light to-primary-glow flex items-center justify-center p-4">
+      <div className="text-center max-w-md">
+        <div className="mb-8">
+          <img src={guardian360Logo} alt="Guardián360" className="w-20 h-20 mx-auto mb-4" />
+          <h1 className="text-3xl font-bold text-primary-foreground mb-2">Guardián360</h1>
+          <p className="text-primary-foreground/80 text-lg">Seguridad Industrial Inteligente</p>
+        </div>
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'home':
-        return <Dashboard />;
-      case 'profile':
-        return <Profile />;
-      case 'safety':
-      case 'analytics':
-      case 'settings':
-        return (
-          <div className="min-h-screen bg-background p-4 pb-20 flex items-center justify-center">
-            <div className="text-center">
-              <h2 className="text-xl font-bold text-foreground mb-2">
-                {activeTab === 'safety' && 'Control de Seguridad'}
-                {activeTab === 'analytics' && 'Análisis y Reportes'}
-                {activeTab === 'settings' && 'Configuraciones'}
-              </h2>
-              <p className="text-muted-foreground">Funcionalidad en desarrollo</p>
-            </div>
+        <Card className="p-6 bg-white/10 backdrop-blur-sm border-white/20">
+          <Shield className="w-12 h-12 mx-auto mb-4 text-primary-foreground" />
+          <h2 className="text-xl font-semibold text-primary-foreground mb-2">
+            Bienvenido al Futuro de la Seguridad
+          </h2>
+          <p className="text-primary-foreground/80 text-sm mb-6">
+            IA predictiva, control EPP automatizado y respuesta inteligente a emergencias
+          </p>
+          
+          <div className="space-y-3">
+            <Button 
+              onClick={() => navigate('/splash')}
+              className="w-full bg-white/20 text-primary-foreground border-white/30 hover:bg-white/30"
+              variant="outline"
+            >
+              Comenzar
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+            
+            <Button 
+              onClick={() => navigate('/manual')}
+              className="w-full"
+              variant="ghost"
+            >
+              Ver Manual de Usuario
+            </Button>
           </div>
-        );
-      default:
-        return <Dashboard />;
-    }
-  };
+        </Card>
 
-  switch (currentScreen) {
-    case 'splash':
-      return <SplashScreen onComplete={handleSplashComplete} />;
-    case 'login':
-      return <Login onLogin={handleLoginSuccess} />;
-    case 'app':
-      return (
-        <>
-          {renderTabContent()}
-          <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
-        </>
-      );
-    default:
-      return <SplashScreen onComplete={handleSplashComplete} />;
-  }
+        <p className="text-primary-foreground/60 text-xs mt-6">
+          Redirigiendo automáticamente...
+        </p>
+      </div>
+    </div>
+  );
 };
 
 export default Index;

@@ -7,16 +7,21 @@ import {
   GraduationCap, 
   Users,
   Camera,
-  BarChart3
+  BarChart3,
+  BookOpen,
+  Settings
 } from 'lucide-react';
 import { PanicButton } from '@/components/ui/panic-button';
 import { QuickAccessCard } from '@/components/dashboard/QuickAccessCard';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 import guardian360Logo from '@/assets/guardian360-logo.png';
 
 const Dashboard = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handlePanicActivation = () => {
     toast({
@@ -32,42 +37,42 @@ const Dashboard = () => {
       title: "IA Predictiva",
       description: "Análisis de riesgos en tiempo real",
       variant: 'primary' as const,
-      onClick: () => toast({ title: "IA Predictiva", description: "Analizando patrones de riesgo..." })
+      onClick: () => navigate('/predictive-ai')
     },
     {
       icon: Shield,
       title: "Control EPP",
       description: "Verificación visual de equipos",
       variant: 'default' as const,
-      onClick: () => toast({ title: "Control EPP", description: "Iniciando verificación de equipos..." })
+      onClick: () => navigate('/ppe-control')
     },
     {
       icon: MapPin,
       title: "Mapa de Riesgos",
       description: "Alertas climáticas y sísmicas",
       variant: 'alert' as const,
-      onClick: () => toast({ title: "Mapa de Riesgos", description: "Cargando alertas ambientales..." })
+      onClick: () => navigate('/risk-map')
     },
     {
       icon: FileCheck,
       title: "Auditoría ISO 45001",
       description: "Evaluación automatizada",
       variant: 'default' as const,
-      onClick: () => toast({ title: "Auditoría ISO", description: "Generando reporte de cumplimiento..." })
+      onClick: () => navigate('/iso-audit')
     },
     {
       icon: GraduationCap,
       title: "Capacitación IA",
       description: "Entrenamiento interactivo",
       variant: 'primary' as const,
-      onClick: () => toast({ title: "Capacitación", description: "Iniciando módulo de entrenamiento..." })
+      onClick: () => navigate('/ai-training')
     },
     {
       icon: Users,
       title: "Comunidad",
       description: "Red empresarial colaborativa",
       variant: 'default' as const,
-      onClick: () => toast({ title: "Comunidad", description: "Accediendo a la red empresarial..." })
+      onClick: () => navigate('/community')
     }
   ];
 
@@ -83,13 +88,17 @@ const Dashboard = () => {
           </div>
         </div>
         
-        {/* Status Card */}
-        <Card className="p-3 bg-gradient-to-r from-primary/10 to-primary-glow/20 border-primary/30">
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            <span className="text-xs font-medium text-foreground">Sistema Activo</span>
-          </div>
-        </Card>
+        {/* Action Buttons */}
+        <div className="flex space-x-2">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/manual')}>
+            <BookOpen className="w-4 h-4 mr-1" />
+            Manual
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => navigate('/profile')}>
+            <Settings className="w-4 h-4 mr-1" />
+            Perfil
+          </Button>
+        </div>
       </div>
 
       {/* Panic Button - Prominent placement */}

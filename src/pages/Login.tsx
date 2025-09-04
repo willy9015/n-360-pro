@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { useNavigate } from 'react-router-dom';
 import { 
   User, 
   Lock, 
@@ -15,11 +16,8 @@ import {
 } from 'lucide-react';
 import guardian360Logo from '@/assets/guardian360-logo.png';
 
-interface LoginProps {
-  onLogin: () => void;
-}
-
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
+const Login: React.FC = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [credentials, setCredentials] = useState({
     username: '',
@@ -28,20 +26,20 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin();
+    navigate('/dashboard');
   };
 
   const handleBiometricLogin = () => {
     // Simulated biometric authentication
     setTimeout(() => {
-      onLogin();
+      navigate('/dashboard');
     }, 1000);
   };
 
   const handleVoiceLogin = () => {
     // Simulated voice authentication
     setTimeout(() => {
-      onLogin();
+      navigate('/dashboard');
     }, 1500);
   };
 
