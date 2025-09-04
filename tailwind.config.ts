@@ -26,11 +26,19 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					light: 'hsl(var(--primary-light))',
+					glow: 'hsl(var(--primary-glow))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					foreground: 'hsl(var(--secondary-foreground))',
+					light: 'hsl(var(--secondary-light))'
+				},
+				alert: {
+					DEFAULT: 'hsl(var(--alert))',
+					foreground: 'hsl(var(--alert-foreground))',
+					light: 'hsl(var(--alert-light))'
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
