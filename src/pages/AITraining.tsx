@@ -1,14 +1,150 @@
-import React, { useState } from 'react';
-import { ArrowLeft, GraduationCap, Play, Volume2, CheckCircle, Trophy } from 'lucide-react';
+import React, { useState, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/hooks/use-toast';
+import { AIServices, type SafetyAnalysisResult, type AudioAnalysisResult } from '@/services/aiServices';
 import { useNavigate } from 'react-router-dom';
+import { 
+  GraduationCap, 
+  Brain, 
+  BookOpen, 
+  Award,
+  Play,
+  Users,
+  Clock,
+  Mic,
+  MicOff,
+  Send,
+  FileText,
+  Loader2,
+  ArrowLeft,
+  Volume2,
+  CheckCircle,
+  Trophy
+} from 'lucide-react';
 
 const AITraining = () => {
+  const { toast } = useToast();
   const navigate = useNavigate();
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [reportText, setReportText] = useState('');
+  const [textAnalysis, setTextAnalysis] = useState<SafetyAnalysisResult | null>(null);
+  const [audioAnalysis, setAudioAnalysis] = useState<AudioAnalysisResult | null>(null);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [activeModule, setActiveModule] = useState<number | null>(null);
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      
+      const audioChunks: Blob[] = [];
+      
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunks.push(event.data);
+      };
+      
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        setAudioBlob(audioBlob);
+        processAudioCommand(audioBlob);
+        
+        // Stop all tracks to release microphone
+        stream.getTracks().forEach(track => track.stop());
+      };
+      
+      mediaRecorder.start();
+      setIsRecording(true);
+      
+      toast({
+        title: "Grabación Iniciada",
+        description: "Habla ahora para registrar tu reporte de seguridad"
+      });
+    } catch (error) {
+      toast({
+        title: "Error de Micrófono",
+        description: "No se pudo acceder al micrófono",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const processAudioCommand = async (audioBlob: Blob) => {
+    setIsAnalyzing(true);
+    try {
+      const result = await AIServices.processAudioCommand(audioBlob);
+      setAudioAnalysis(result);
+      
+      toast({
+        title: "Audio Procesado",
+        description: `Comando reconocido con prioridad ${result.priority}`,
+        variant: result.priority === 'emergency' ? "destructive" : "default"
+      });
+    } catch (error) {
+      toast({
+        title: "Error de Procesamiento",
+        description: "No se pudo procesar el comando de audio",
+        variant: "destructive"
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const analyzeText = async () => {
+    if (!reportText.trim()) return;
+    
+    setIsAnalyzing(true);
+    try {
+      const result = await AIServices.analyzeSafetyText(reportText);
+      setTextAnalysis(result);
+      
+      toast({
+        title: "Análisis Completado",
+        description: `Nivel de riesgo: ${result.riskLevel}`,
+        variant: result.riskLevel === 'critical' || result.riskLevel === 'high' ? "destructive" : "default"
+      });
+    } catch (error) {
+      toast({
+        title: "Error de Análisis",
+        description: "No se pudo analizar el texto",
+        variant: "destructive"
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'emergency': return 'destructive';
+      case 'high': return 'secondary';
+      case 'medium': return 'outline';
+      default: return 'default';
+    }
+  };
+
+  const getRiskColor = (riskLevel: string) => {
+    switch (riskLevel) {
+      case 'critical': return 'destructive';
+      case 'high': return 'secondary';
+      case 'medium': return 'outline';
+      default: return 'default';
+    }
+  };
 
   const trainingModules = [
     {
@@ -79,6 +215,130 @@ const AITraining = () => {
           <h1 className="text-xl font-bold text-foreground">Capacitación IA</h1>
         </div>
       </div>
+
+      {/* AI Safety Assistant */}
+      <Card className="p-4 mb-6">
+        <h3 className="font-semibold text-foreground mb-4 flex items-center">
+          <Brain className="w-5 h-5 mr-2" />
+          Asistente de Seguridad IA
+        </h3>
+        
+        {/* Text Analysis */}
+        <div className="mb-6">
+          <h4 className="font-medium mb-2">Análisis de Texto</h4>
+          <div className="space-y-3">
+            <Textarea
+              placeholder="Escribe tu reporte de seguridad aquí..."
+              value={reportText}
+              onChange={(e) => setReportText(e.target.value)}
+              className="min-h-[100px]"
+            />
+            
+            <Button 
+              onClick={analyzeText} 
+              disabled={!reportText.trim() || isAnalyzing}
+              className="w-full"
+            >
+              {isAnalyzing ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <FileText className="w-4 h-4 mr-2" />
+              )}
+              Analizar Reporte
+            </Button>
+
+            {textAnalysis && (
+              <div className="mt-4 space-y-3 p-3 bg-muted/50 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">Nivel de Riesgo:</span>
+                  <Badge variant={getRiskColor(textAnalysis.riskLevel)}>
+                    {textAnalysis.riskLevel.toUpperCase()}
+                  </Badge>
+                </div>
+                
+                <div>
+                  <span className="font-medium">Riesgos Identificados:</span>
+                  <ul className="mt-1 text-sm text-muted-foreground">
+                    {textAnalysis.risks.map((risk, index) => (
+                      <li key={index}>• {risk}</li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div>
+                  <span className="font-medium">Recomendaciones:</span>
+                  <ul className="mt-1 text-sm text-muted-foreground">
+                    {textAnalysis.recommendations.map((rec, index) => (
+                      <li key={index}>• {rec}</li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div className="text-xs text-muted-foreground">
+                  Confianza: {Math.round(textAnalysis.confidence * 100)}%
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Audio Recording */}
+        <div className="mb-6">
+          <h4 className="font-medium mb-2">Comando de Voz</h4>
+          <div className="space-y-3">
+            <Button 
+              onClick={isRecording ? stopRecording : startRecording}
+              disabled={isAnalyzing}
+              className="w-full"
+              variant={isRecording ? "destructive" : "outline"}
+            >
+              {isRecording ? (
+                <MicOff className="w-4 h-4 mr-2" />
+              ) : (
+                <Mic className="w-4 h-4 mr-2" />
+              )}
+              {isRecording ? 'Detener Grabación' : 'Grabar Comando'}
+            </Button>
+
+            {isAnalyzing && (
+              <div className="text-center py-2">
+                <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">Procesando audio...</p>
+              </div>
+            )}
+
+            {audioAnalysis && (
+              <div className="mt-4 space-y-3 p-3 bg-muted/50 rounded-lg">
+                <div>
+                  <span className="font-medium">Texto Transcrito:</span>
+                  <p className="text-sm text-muted-foreground mt-1">"{audioAnalysis.text}"</p>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">Prioridad:</span>
+                  <Badge variant={getPriorityColor(audioAnalysis.priority)}>
+                    {audioAnalysis.priority.toUpperCase()}
+                  </Badge>
+                </div>
+                
+                <div>
+                  <span className="font-medium">Intención:</span>
+                  <p className="text-sm text-muted-foreground">{audioAnalysis.intent}</p>
+                </div>
+                
+                <div>
+                  <span className="font-medium">Acciones Sugeridas:</span>
+                  <ul className="mt-1 text-sm text-muted-foreground">
+                    {audioAnalysis.actions.map((action, index) => (
+                      <li key={index}>• {action}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </Card>
 
       {/* Progress Overview */}
       <Card className="p-6 mb-6 bg-gradient-to-br from-primary/5 to-primary-glow/10">
