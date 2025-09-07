@@ -16,6 +16,7 @@ import ISOAudit from "./pages/ISOAudit";
 import AITraining from "./pages/AITraining";
 import Community from "./pages/Community";
 import UserManual from "./pages/UserManual";
+import Checklists from "./pages/Checklists";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/ai-training" element={<AITraining />} />
             <Route path="/community" element={<Community />} />
             <Route path="/manual" element={<UserManual />} />
+            <Route path="/checklists" element={<Checklists />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

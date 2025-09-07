@@ -9,9 +9,12 @@ import {
   Camera,
   BarChart3,
   BookOpen,
-  Settings
+  Settings,
+  CheckSquare
 } from 'lucide-react';
 import { PanicButton } from '@/components/ui/panic-button';
+import { VoicePanicButton } from '@/components/VoicePanicButton';
+import { OfflineIndicator } from '@/components/ui/offline-indicator';
 import { QuickAccessCard } from '@/components/dashboard/QuickAccessCard';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,6 +32,17 @@ const Dashboard = () => {
       description: "Se ha notificado a los equipos de respuesta. Mantén la calma.",
       variant: "destructive",
     });
+  };
+
+  const handleVoicePanic = (transcript: string) => {
+    toast({
+      title: "🚨 Emergencia Detectada por Voz",
+      description: `Frase detectada: "${transcript}". Notificando equipos de respuesta...`,
+      variant: "destructive",
+    });
+    
+    // Here you would implement actual emergency response logic
+    // such as sending alerts to supervisors, logging location, etc.
   };
 
   const quickAccessItems = [
@@ -73,6 +87,13 @@ const Dashboard = () => {
       description: "Red empresarial colaborativa",
       variant: 'default' as const,
       onClick: () => navigate('/community')
+    },
+    {
+      icon: CheckSquare,
+      title: "Checklists",
+      description: "Inspecciones dinámicas",
+      variant: 'primary' as const,
+      onClick: () => navigate('/checklists')
     }
   ];
 
@@ -81,15 +102,16 @@ const Dashboard = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-3">
-          <img src={guardian360Logo} alt="Guardián360" className="w-10 h-10" />
+          <img src={guardian360Logo} alt="Guardián 45001" className="w-10 h-10" />
           <div>
-            <h1 className="text-xl font-bold text-foreground">Guardián360</h1>
-            <p className="text-sm text-muted-foreground">Seguridad Industrial Inteligente</p>
+            <h1 className="text-xl font-bold text-foreground">Guardián 45001</h1>
+            <p className="text-sm text-muted-foreground">Plataforma ISO 45001 Completa</p>
           </div>
         </div>
         
         {/* Action Buttons */}
-        <div className="flex space-x-2">
+        <div className="flex items-center space-x-2">
+          <OfflineIndicator />
           <Button variant="ghost" size="sm" onClick={() => navigate('/manual')}>
             <BookOpen className="w-4 h-4 mr-1" />
             Manual
@@ -102,12 +124,13 @@ const Dashboard = () => {
       </div>
 
       {/* Panic Button - Prominent placement */}
-      <div className="flex justify-center mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <div className="text-center">
           <PanicButton onPanic={handlePanicActivation} />
           <p className="text-xs text-muted-foreground mt-2">Botón de Pánico</p>
-          <p className="text-xs text-muted-foreground">Toque • Voz • Vibración</p>
+          <p className="text-xs text-muted-foreground">Toque • Vibración</p>
         </div>
+        <VoicePanicButton onPanicDetected={handleVoicePanic} />
       </div>
 
       {/* Quick Stats */}

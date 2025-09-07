@@ -21,9 +21,9 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary via-primary-light to-primary-glow flex items-center justify-center p-4">
       <div className="text-center max-w-md">
         <div className="mb-8">
-          <img src={guardian360Logo} alt="Guardián360" className="w-20 h-20 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-primary-foreground mb-2">Guardián360</h1>
-          <p className="text-primary-foreground/80 text-lg">Seguridad Industrial Inteligente</p>
+          <img src={guardian360Logo} alt="Guardián 45001" className="w-20 h-20 mx-auto mb-4" />
+          <h1 className="text-3xl font-bold text-primary-foreground mb-2">Guardián 45001</h1>
+          <p className="text-primary-foreground/80 text-lg">Plataforma ISO 45001 Completa</p>
         </div>
 
         <Card className="p-6 bg-white/10 backdrop-blur-sm border-white/20">
